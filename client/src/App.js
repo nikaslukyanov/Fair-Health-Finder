@@ -3,7 +3,7 @@ import './App.css';
 
 function App() {
   return (
-    <div className="flex flex-row min-h-screen p-6 bg-gray-100">
+    <div className="flex flex-col min-h-screen p-6 bg-gray-100 items-center">
       {/* Welcome Text */}
       <p className="mb-8 text-lg font-semibold text-center">Welcome to our [insert team project here]</p>
 
