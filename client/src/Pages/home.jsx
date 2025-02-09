@@ -12,7 +12,7 @@ function Home() {
         <div className="max-w-sm border-r border-gray-300 pr-6 order-1">
           <h3 className="text-xl font-bold mb-2">Don't have an account?</h3>
           <p className="mb-4">Create an account to get started.</p>
-          <a href="/#/register" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Register</a>
+          <a href="/register" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Register</a>
         </div>
 
         <div className="max-w-sm order-2">
