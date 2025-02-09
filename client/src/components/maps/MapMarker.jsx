@@ -1,7 +1,7 @@
 import React from 'react';
 import {APIProvider, Map, Marker} from '@vis.gl/react-google-maps';
 import { useState } from 'react';
-import { Modal, Box, Typography } from '@mui/material';
+import { Modal, Box, Typography, Button, Popover} from '@mui/material';
 
 const style = {
     position: 'absolute',
@@ -19,6 +19,9 @@ const style = {
 
 function MapMarkerComponent(props) {
     const [modal, setModal] = useState(false);
+    const [showHospital, setShowHospital] = useState(false);
+    const id = showHospital ? 'simple-popover' : undefined;
+
     console.log(props.details.satisfaction_summary_stats)
 
     return (
@@ -33,15 +36,19 @@ function MapMarkerComponent(props) {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
             >
-            <Box sx={{ ...style, width: "60vw", height: "80vh" }}>
+            <Box sx={{ ...style, width: "60vw", height: "80vh", display: "flex", flexDirection: "column", alignItems: "left"}}>
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                 {props.details.name}
                 </Typography>
-                {Object.keys(props.details.satisfaction_summary_stats).map((stat, index) => (
+                <Button sx={{backgroundColor:"black",padding: "10px", display: "flex", flexDirection: "column", alignItems: "center"}} aria-describedby={id} variant="contained" onClick={() => {setShowHospital(!showHospital)}}>
+                    Overall Rating: {props.details.satisfaction_summary_stats["Overall hospital rating"]}
+                    {showHospital && Object.keys(props.details.satisfaction_summary_stats).map((stat, index) => (
                     <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
                         {stat} - {props.details.satisfaction_summary_stats[stat]}
                     </Typography>
                 ))}
+                </Button>
+                
                 
             </Box>
             </Modal>
