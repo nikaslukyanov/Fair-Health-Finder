@@ -1,14 +1,12 @@
 Demographic 
-Medicaid 
-
-
-
+Medicaid / Medicare  
+Condition 
 
 
 Rating system 
-+ Mortality/Complication rate -
++ Mortality/Complication rate
 + Cost Analysis 
-+ Patient satisfaction (survey)
++ Patient satisfaction (survey) - ask nykash to quantify 
 - Patient discharge times
 - Readadmission rate 
 - Race / Gender bias
