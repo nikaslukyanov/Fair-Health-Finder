@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import MapComponent from "../components/maps/MapComponent";
 import MapMarkerComponent from "../components/maps/MapMarker";
 import {AdvancedMarker, Pin, useAdvancedMarkerRef} from '@vis.gl/react-google-maps';
+import { useNavigate } from 'react-router-dom';
+import { MessageCircle } from 'lucide-react';
 
 function MapView() {
   const [data, setData] = useState({});
@@ -9,6 +11,7 @@ function MapView() {
   const [markerRef, marker] = useAdvancedMarkerRef();
   const [modal, setModal] = useState(false);
   const [showBanner, setShowBanner] = useState(true);
+  const navigate = useNavigate();
   
   useEffect(() => {
     // Load user data from localStorage
@@ -60,6 +63,15 @@ function MapView() {
           </p>
         </div>
       )}
+
+      {/* Chat button */}
+      <button
+        onClick={() => navigate('/chat')}
+        className="absolute bottom-6 right-6 z-10 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+        aria-label="Open Chat"
+      >
+        <MessageCircle className="w-6 h-6" />
+      </button>
 
       <MapComponent>
         {Object.keys(data).map((key) => (
