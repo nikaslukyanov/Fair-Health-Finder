@@ -61,6 +61,9 @@ function MapMarkerComponent(props) {
                 onClick={() => {setModal(true)}}>
             
             </Marker>
+
+            
+
             <Modal
             open={modal}
             onClose={() => {setModal(false)}}
