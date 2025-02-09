@@ -1,0 +1,23 @@
+Demographic 
+Medicaid / Medicare  
+Condition 
+
+
+Rating system 
++ Mortality/Complication rate
++ Cost Analysis 
++ Patient satisfaction (survey) - ask nykash to quantify 
+- Patient discharge times
+- Readadmission rate 
+- Race / Gender bias
+- 
+
+
+
+ER / impatient
+Charity care provision for uninsured patients
+
+
+
+
+
