@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require("mongoose");
 const User = require("./models/User.js");
+const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
@@ -8,7 +9,7 @@ const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 3000;
 
 // skibidi middleware to parse the kai cenat JSON file (人◕ω◕)
-app.use(express.json());
+app.use(express.json(),cors());
 
 mongoose
     .connect(MONGO_URI)
