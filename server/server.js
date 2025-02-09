@@ -34,14 +34,42 @@ app.get('/', (req, res) => {
 // BaaaaaaKKAKAA creating a new ₊✩‧₊˚౨ৎ b a b y g r o n k ౨ৎ˚₊✩‧₊ user (POST)
 app.post("/users", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password) {
+    const {
+      username, password, firstname, lastname, race, zipcode, hispanic, insurance, gender,
+      cardiac_conditions, cancer_related_conditions, neurological_disorders, trauma_injury,
+      respiratory_conditions, digestive_disorders, musculoskeletal_disorders, 
+      endocrine_metabolic_disorders, delivery_neonatal_procedures, infectious_diseases, other_conditions,
+      chest_pain, shortness_of_breath, fatigue, palpitations, nausea_vomiting, unexplained_weight_loss,
+      pain, headaches, dizziness_vertigo, numbness_weakness_limbs, seizures, bruising, swelling_inflammation,
+      restricted_movement, coughing, wheezing, chest_tightness, abdominal_pain, diarrhea, bloating_indigestion,
+      joint_pain, muscle_stiffness, decreased_range_of_motion, unexplained_weight_changes, increased_thirst_urination,
+      hot_cold_intolerance, preterm_labor, bleeding_pregnancy, high_blood_pressure, premature_rupture_membranes,
+      fever, chills, insomnia, weight_loss_gain
+    } = req.body;
+    
+    // Check required fields
+    if (!username || !password || !firstname || !lastname || !race || !zipcode) {
       return res.status(400).json({ error: "Missing required fields" });
     }
-    const newUser = await User.create({ username, email, password });
+
+    const newUser = await User.create({ 
+      username, password, firstname, lastname, race, zipcode, hispanic, insurance, gender,
+      cardiac_conditions, cancer_related_conditions, neurological_disorders, trauma_injury,
+      respiratory_conditions, digestive_disorders, musculoskeletal_disorders, 
+      endocrine_metabolic_disorders, delivery_neonatal_procedures, infectious_diseases, other_conditions,
+      chest_pain, shortness_of_breath, fatigue, palpitations, nausea_vomiting, unexplained_weight_loss,
+      pain, headaches, dizziness_vertigo, numbness_weakness_limbs, seizures, bruising, swelling_inflammation,
+      restricted_movement, coughing, wheezing, chest_tightness, abdominal_pain, diarrhea, bloating_indigestion,
+      joint_pain, muscle_stiffness, decreased_range_of_motion, unexplained_weight_changes, increased_thirst_urination,
+      hot_cold_intolerance, preterm_labor, bleeding_pregnancy, high_blood_pressure, premature_rupture_membranes,
+      fever, chills, insomnia, weight_loss_gain
+    });
+
     res.status(201).json({ message: "User created successfully!", user: newUser });
+
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error("Error creating user:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -62,6 +90,7 @@ app.put("/users/:id", async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: "Invalid user ID" });
     }
+    
     const updatedUser = await User.findByIdAndUpdate(
       id, 
       req.body, 
@@ -72,6 +101,7 @@ app.put("/users/:id", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
     res.status(200).json({ message: "User updated successfully!", user: updatedUser });
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -86,6 +116,7 @@ app.delete("/users/:id", async (req, res) => {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
     res.status(200).json({ message: "User deleted successfully" });
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -121,3 +152,4 @@ server.on('error', (error) => {
   }
   process.exit(1);
 });
+
