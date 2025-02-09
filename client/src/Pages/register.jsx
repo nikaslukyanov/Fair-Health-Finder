@@ -2,8 +2,10 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { Slider } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
+    const navigate = useNavigate();
     const diseaseData = [
         {
           disease_group: "Cardiac Conditions",
@@ -215,6 +217,7 @@ function Register() {
                         setErrors({ submit: error.response?.data?.error || 'Registration failed' });
                     } finally {
                         setSubmitting(false);
+                        navigate("/map_view")
                     }
                 }}
                 validateOnChange={true}
