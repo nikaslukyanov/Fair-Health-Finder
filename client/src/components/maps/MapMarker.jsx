@@ -3,9 +3,10 @@ import {APIProvider, Map, Marker, Pin,
     InfoWindow,
     useAdvancedMarkerRef} from '@vis.gl/react-google-maps';
 import { useState } from 'react';
-import { Modal, Box, Typography, Button, Popover} from '@mui/material';
+import { Modal, Box, Typography, Button, Popover, List} from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import {AdvancedMarker, AdvancedMarkerAnchorPoint} from '@vis.gl/react-google-maps';
+import './marker.css';
 
 const user_profile = {
     age: 30,
@@ -29,10 +30,28 @@ const style = {
     pb: 3,
   };
 
+  function interpolateColor(value) {
+    value = Math.max(0, Math.min(100, value)); // Clamp value between 0 and 100
+
+    let r, g;
+
+    if (value <= 50) {
+        // Interpolate between red (255,0,0) and yellow (255,255,0)
+        r = 255;
+        g = Math.round((value / 50) * 255);
+    } else {
+        // Interpolate between yellow (255,255,0) and green (0,255,0)
+        r = Math.round(255 * (1 - (value - 50) / 50));
+        g = 255;
+    }
+
+    return `#${((1 << 24) | (r << 16) | (g << 8)).toString(16).slice(1)}`;
+}
+
   function CircularProgressWithLabel(props) {
     return (
       <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-        <CircularProgress variant="determinate" {...props}/>
+        <CircularProgress variant="determinate" {...props} sx={{color: interpolateColor(props.value)}}/>
         <Box
           sx={{
             top: 0,
@@ -63,6 +82,8 @@ function MapMarkerComponent(props) {
 
     const [showHospital, setShowHospital] = useState(false);
     const [markerRef, marker] = useAdvancedMarkerRef();
+
+    const ignore_sats = ["Overall hospital rating", "Recommend hospital", "Discharge information", "Care transition"]
 
     const id = showHospital ? 'simple-popover' : undefined;
 
@@ -107,14 +128,15 @@ function MapMarkerComponent(props) {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
             >
-            <Box sx={{ ...style, width: "60vw", height: "80vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between"}}>
+            <Box sx={{ ...style, width: "60vw", height: "80vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-around"}}>
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                 {props.details.name}
                 </Typography>
                 <CircularProgressWithLabel value={overallScore} style={{width: "20vw", height: "20vw"}} />
 
-                <Box style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between"}}>
-                    <Button sx={{backgroundColor:"black",padding: "10px", display: "flex", flexDirection: "column", alignItems: "center"}} aria-describedby={id} variant="contained" onClick={() => {setShowSatisfactionModal(true)}}>
+                <Box style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
+                    <Button sx={{backgroundColor:"black",padding: "10px", display: "flex", flexDirection: "column", alignItems: "center"}} aria-describedby={id} variant="contained" onMouseOver={() => {setShowSatisfactionModal(true)}}
+    >
                         Satisfaction Rating: {props.details.satisfaction_summary_stats["Overall hospital rating"]}
                         {showHospital && Object.keys(props.details.satisfaction_summary_stats).map((stat, index) => (
                         <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
@@ -125,21 +147,24 @@ function MapMarkerComponent(props) {
                     <Modal open={showSatisfactionModal} onClose={() => {setShowSatisfactionModal(false)}} 
                         aria-labelledby="modal-modal-title"
                         aria-describedby="modal-modal-description">
-                        <Box sx={{ ...style, width: "40vw", height: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between"}}>
+                        <Box sx={{ ...style, width: "40vw", height: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between"}} onMouseLeave={() => {setShowSatisfactionModal(false)}}>
                             <Typography id="modal-modal-title" variant="h6" component="h2">
                                 Satisfaction Ratings
                             </Typography>
-                            {Object.keys(props.details.satisfaction_summary_stats).map((stat, index) => (
-                                <Box style={{display: "flex", flexDirection: "row", alignItems: "space-between", justifyContent: "space-between"}} key={index} id="modal-modal-description" sx={{ mt: 2 }}>
+                            <List style={{maxHeight: '100%', overflow: 'auto', width: '100%'}}>
+                                {Object.keys(props.details.satisfaction_summary_stats).filter(stat => !ignore_sats.includes(stat)).map((stat, index) => (
+                                    <Box style={{display: "flex", flexDirection: "row", alignItems: "space-between", justifyContent: "space-between"}} key={index} id="modal-modal-description" sx={{ mt: 2 }}>
 
-                                    <Typography style={{fontSize: "1.5vw", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}} key={index} id="modal-modal-description" sx={{ mt: 2 }}>
-                                        {stat}
-                                    </Typography>
-                                    <CircularProgressWithLabel value={props.details.satisfaction_summary_stats[stat]} />
-                                </Box>
-                            ))}
+                                        <Typography style={{fontSize: "1.5vw", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}} key={index} id="modal-modal-description" sx={{ mt: 2 }}>
+                                            {stat}
+                                        </Typography>
+                                        <CircularProgressWithLabel value={props.details.satisfaction_summary_stats[stat]} />
+                                    </Box>
+                                ))}
+                            </List>
                         </Box>
                     </Modal>
+
 
                     <Button sx={{backgroundColor:"black",padding: "10px", display: "flex", flexDirection: "column", alignItems: "center"}} aria-describedby={id} variant="contained" onClick={() => {setShowCostsModal(true)}}>
                         Cost Rating: {cost_score}
