@@ -141,7 +141,7 @@ app.post("/login", async (req, res) => {
             });
         }
 
-        // If credentials are correct
+        // If credentials are correct, send back the user data
         res.status(200).json({
             success: true,
             message: "Login successful",
@@ -149,7 +149,7 @@ app.post("/login", async (req, res) => {
                 id: user._id,
                 username: user.username,
                 firstname: user.firstname,
-                lastname: user.lastname
+                lastname: user.lastname,
                 // Add any other user data you want to send to the frontend
             }
         });

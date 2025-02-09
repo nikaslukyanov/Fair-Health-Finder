@@ -1,18 +1,27 @@
 import logo from './logo.svg';
 import './App.css';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './Pages/home';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import MapView from './Pages/map_view';
 import Register from './Pages/register';
 import Signin from './Pages/signin';
+import ProtectedRoute from './components/ProtectedRoute';
+
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        {/* Redirect root to signin */}
+        <Route path="/" element={<Navigate to="/signin" replace />} />
         <Route path="/register" element={<Register/>}/>
-        <Route path="/map_view" element={<MapView />} />
         <Route path="/signin" element={<Signin/>}/>
+        <Route 
+          path="/map_view" 
+          element={
+            <ProtectedRoute>
+              <MapView />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

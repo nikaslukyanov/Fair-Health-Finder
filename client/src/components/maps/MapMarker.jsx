@@ -8,14 +8,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {AdvancedMarker, AdvancedMarkerAnchorPoint} from '@vis.gl/react-google-maps';
 import './marker.css';
 
-const user_profile = {
-    age: 30,
-    gender: "male",
-    income: 50000,
-    location: "New York",
-    health_profile: {"Digestive Disorders": 2, "Cardiac Conditions": 3},
-}
-
 const style = {
     position: 'absolute',
     top: '50%',
@@ -88,6 +80,15 @@ function MapMarkerComponent(props) {
     const [markerRef, marker] = useAdvancedMarkerRef();
     const [overallScore, setOverallScore] = useState(-1);
     const [costScore, setCostScore] = useState(-1);
+
+    // Use the passed user profile instead of the hardcoded one
+    const user_profile = props.userProfile || {
+        age: 30,
+        gender: "male",
+        income: 50000,
+        location: "New York",
+        health_profile: {"Digestive Disorders": 2, "Cardiac Conditions": 3},
+    };
 
     // Move all calculations into useEffect
     React.useEffect(() => {
