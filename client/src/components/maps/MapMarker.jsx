@@ -56,10 +56,10 @@ function MapMarkerComponent(props) {
 
     return (
         <React.Fragment>
-            <AdvancedMarker position={{lat: props.details.lat, lng: props.details.lon}}
+            <Marker position={{lat: props.details.lat, lng: props.details.lon}}
                 
                 onClick={() => {setModal(true)}}>
-            </AdvancedMarker>
+            </Marker>
 
             <Modal
             open={modal}
