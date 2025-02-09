@@ -1,20 +1,48 @@
 const express = require('express');
 const mongoose = require("mongoose");
-const User = require("./models/User.js");
 const cors = require("cors");
 require("dotenv").config();
+
+const User = require("./models/User.js");
+
+// --- Dummy Groq API Object ---
+// Remove or replace this with your real Groq API client if available.
+const groq = {
+    chat: {
+        completions: {
+            create: async ({ messages, model }) => {
+                // Simulate an API call delay if desired
+                return {
+                    choices: [
+                        {
+                            message: { content: "This is a dummy response from the Groq API." }
+                        }
+                    ]
+                };
+            }
+        }
+    }
+};
 
 const app = express();
 const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 3000;
 
-// skibidi middleware to parse the kai cenat JSON file (人◕ω◕)
-app.use(express.json(),cors());
+// Check if MONGO_URI is provided
+if (!MONGO_URI) {
+    console.error("Error: MONGO_URI not set in environment variables.");
+    process.exit(1);
+}
 
+// Middleware: Parse JSON and handle CORS
+app.use(express.json());
+app.use(cors());
+
+// Connect to MongoDB
 mongoose
     .connect(MONGO_URI)
     .then(() => console.log("Connected to MongoDB Atlas"))
-    .catch((err) => { 
+    .catch((err) => {
         console.error("MongoDB connection error details:", {
             message: err.message,
             code: err.code,
@@ -25,12 +53,13 @@ mongoose
 
 console.log('Initializing server...');
 
+// Root route
 app.get('/', (req, res) => {
     console.log('Received request to /');
     res.status(200).json({ message: 'Hello World!' });
 });
 
-// BaaaaaaKKAKAA creating a new ₊✩‧₊˚౨ৎ b a b y g r o n k ౨ৎ˚₊✩‧₊ user (POST)
+// Create a new user (POST)
 app.post("/users", async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -44,7 +73,7 @@ app.post("/users", async (req, res) => {
     }
 });
 
-// heheh Get all meowsers (˵¯͒〰¯͒˵) (GET)
+// Get all users (GET)
 app.get("/users", async (req, res) => {
     try {
         const users = await User.find().select('-password').lean();
@@ -54,7 +83,7 @@ app.get("/users", async (req, res) => {
     }
 });
 
-// OMGGG now we're gonna update a user UWU (•ㅅ•) (PUT)
+// Update a user by ID (PUT)
 app.put("/users/:id", async (req, res) => {
     try {
         const { id } = req.params;
@@ -62,11 +91,11 @@ app.put("/users/:id", async (req, res) => {
             return res.status(400).json({ error: "Invalid user ID" });
         }
         const updatedUser = await User.findByIdAndUpdate(
-            id, 
-            req.body, 
+            id,
+            req.body,
             { new: true, runValidators: true }
         ).select('-password').lean();
-        
+
         if (!updatedUser) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -76,7 +105,7 @@ app.put("/users/:id", async (req, res) => {
     }
 });
 
-// We deleting out here (=^･ω･^=) (DEL)
+// Delete a user by ID (DELETE)
 app.delete("/users/:id", async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -90,7 +119,31 @@ app.delete("/users/:id", async (req, res) => {
     }
 });
 
-// Add error handling middleware (－_－) zzZ
+// Groq API route (POST)
+app.post("/api/groq", async (req, res) => {
+    try {
+        const { prompt } = req.body;
+        if (!prompt) {
+            return res.status(400).json({ error: "Missing prompt" });
+        }
+
+        // Call Groq API (or use the dummy function above)
+        const completion = await groq.chat.completions.create({
+            messages: [{ role: "user", content: prompt }],
+            model: "llama-3.3-70b-versatile", // Choose your preferred model
+        });
+
+        res.status(200).json({
+            model: "Groq LLaMA-3.3 70B",
+            response: completion.choices[0].message.content,
+        });
+    } catch (error) {
+        console.error("Error calling Groq API:", error);
+        res.status(500).json({ error: error.message || "Internal server error" });
+    }
+});
+
+// Error handling middleware
 app.use((err, req, res, next) => {
     console.error("Server Error:", err.stack);
     res.status(500).json({
@@ -99,7 +152,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-// HOUSTON WE ARE STARRRRTING the server (☝ ՞ਊ ՞)☝ 
+// Start the server
 const server = app.listen(PORT, (error) => {
     if (error) {
         console.error('Error starting server:', error);
@@ -108,7 +161,7 @@ const server = app.listen(PORT, (error) => {
     console.log(`Server successfully started on port ${PORT}`);
 });
 
-// Gotta manage and handle da server errors HEHEHEHE (づ ◕‿◕ )づ
+// Handle server errors
 server.on('error', (error) => {
     if (error.code === 'EADDRINUSE') {
         console.error(`Port ${PORT} is already in use`);
