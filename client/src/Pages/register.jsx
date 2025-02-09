@@ -242,25 +242,26 @@ function Register() {
                 <label htmlFor={name} className="block text-gray-700 font-semibold mb-2">
           {label}
         </label>
-        <div className="flex items-center">
+        <div className="flex items-left">
           <Slider
             name={name}
             onChange={(event, newValue) => setFieldValue(name, newValue)}
             min={1}
             max={5}
             step={1}
+            defaultValue={1}
             marks={marks}
             valueLabelDisplay="auto"
-            className="w-3/4"
+            sx={{width: "80%"}}
           />
         </div>
-            </div>
+        </div>
         ))}
         
       </div>
     ))}
   </div>
-                        <button onClick={() => {
+    <button onClick={() => {
         const groupedValues = {}
         diseaseData.forEach(({ disease_group, symptoms }) => {
             // Initialize sum for the disease group if not already done
