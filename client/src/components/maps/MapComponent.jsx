@@ -1,9 +1,6 @@
 import React from 'react';
 import {APIProvider, Map, Marker} from '@vis.gl/react-google-maps';
 
-const GOOGLE_MAPS_API_KEY = "AIzaSyBoOak0ZV4Cln-yGCg0Z461MiGwemO6JqE";
-
-
 function MapComponent({children}) {
     return (
         <div>
