@@ -1,5 +1,5 @@
 import React from 'react';
-import {AdvancedMarker, APIProvider, Map, Marker} from '@vis.gl/react-google-maps';
+import {AdvancedMarker, APIProvider, Map, Marker, Pin} from '@vis.gl/react-google-maps';
 import { useState } from 'react';
 import { Modal, Box, Typography, Button, Popover} from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -56,13 +56,10 @@ function MapMarkerComponent(props) {
 
     return (
         <React.Fragment>
-            <Marker position={{lat: props.details.lat, lng: props.details.lon}}
+            <AdvancedMarker position={{lat: props.details.lat, lng: props.details.lon}}
                 
                 onClick={() => {setModal(true)}}>
-            
-            </Marker>
-
-            
+            </AdvancedMarker>
 
             <Modal
             open={modal}

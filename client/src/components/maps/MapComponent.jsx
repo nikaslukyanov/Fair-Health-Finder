@@ -13,6 +13,7 @@ function MapComponent({children}) {
                 defaultZoom={12}
                 gestureHandling={'greedy'}
                 disableDefaultUI={true}
+                mapId="map-main"
                 >
                     {children}
                 </Map>
