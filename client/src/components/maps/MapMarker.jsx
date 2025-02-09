@@ -1,28 +1,49 @@
 import React from 'react';
 import {APIProvider, Map, Marker} from '@vis.gl/react-google-maps';
+import { useState } from 'react';
+import { Modal, Box, Typography } from '@mui/material';
+
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    pt: 2,
+    px: 4,
+    pb: 3,
+  };
 
 function MapMarkerComponent(props) {
     const [modal, setModal] = useState(false);
+    console.log(props.details.satisfaction_summary_stats)
 
     return (
-        <Marker position={{lat: props.details.lat, lng: props.details.lng}}
-        onClick={() => setModal(true)}>
+        <React.Fragment>
+            <Marker position={{lat: props.details.lat, lng: props.details.lon}}
+                onClick={() => {setModal(true)}}>
+            
+            </Marker>
             <Modal
-            open={open}
-            onClose={handleClose}
+            open={modal}
+            onClose={() => {setModal(false)}}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
             >
-            <Box sx={style}>
+            <Box sx={{ ...style, width: "60vw", height: "60vh" }}>
                 <Typography id="modal-modal-title" variant="h6" component="h2">
-                Text in a modal
+                {props.details.name}
                 </Typography>
                 <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+                    {props.details.satisfaction_summary_stats["Nurse communication"]}
                 </Typography>
             </Box>
             </Modal>
-        </Marker>
+        </React.Fragment>
+        
         
     )
 }
