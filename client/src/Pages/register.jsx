@@ -210,6 +210,9 @@ function Register() {
                         const response = await axios.post('http://localhost:3000/users', payload);
                         console.log('Registration successful:', response.data);
                         
+                        // Store user data in localStorage before navigation
+                        localStorage.setItem('user', JSON.stringify(response.data.user));
+                        
                         alert('Registration successful!');
                         
                     } catch (error) {
