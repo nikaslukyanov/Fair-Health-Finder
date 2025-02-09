@@ -10,7 +10,7 @@ const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 3000;
 
 // skibidi middleware to parse the kai cenat JSON file (人◕ω◕)
-app.use(express.json(), cors());
+app.use(express.json(), cors({ origin: "http://localhost:3001", credentials: true }));
 
 mongoose
   .connect(MONGO_URI)
@@ -124,6 +124,44 @@ app.delete("/users/:id", async (req, res) => {
 
 // New Groq API Route (╯°□°）╯︵ ┻━┻)
 app.use("/api/groq", groqRoutes); // Linking the Groq API route
+
+// Add this route to your existing server.js
+app.post("/login", async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        // Find user by username
+        const user = await User.findOne({ username });
+
+        // If user doesn't exist or password doesn't match
+        if (!user || user.password !== password) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid username or password"
+            });
+        }
+
+        // If credentials are correct
+        res.status(200).json({
+            success: true,
+            message: "Login successful",
+            user: {
+                id: user._id,
+                username: user.username,
+                firstname: user.firstname,
+                lastname: user.lastname
+                // Add any other user data you want to send to the frontend
+            }
+        });
+
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).json({
+            success: false,
+            message: "An error occurred during login"
+        });
+    }
+});
 
 // Add error handling middleware (－_－) zzZ
 app.use((err, req, res, next) => {
