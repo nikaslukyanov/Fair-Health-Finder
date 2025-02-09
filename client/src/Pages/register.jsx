@@ -8,14 +8,32 @@ function Register() {
             initialValues={{ username: '' , password: ''}}
             onSubmit={(values) => {
                 console.log(values);
-
+            }}
+            validateOnChange={true}
+            validateOnBlur={true}
+            validate={(values) => {
+                const errors = {}
+                if(!values.username) {
+                    errors.username = "Required"
+                }
+                if(!values.password) {
+                    errors.password = "Required"
+                }
+                if(!values.firstname) {
+                    errors.firstname = "Required"
+                }
+                if(!values.lastname) {
+                    errors.lastname = "Required"
+                }
+                return errors
             }}
         >
-            {({ isSubmitting }) => (
+            {({ isSubmitting, isValid, dirty}) => (
                 <div className="form-container">
                     <Form className="form">
                         <h1 className='font-bold text-lg text-center'> Registration Form </h1>
                         
+                        <h2 className='font-bold'> Section 1: Account & Demographic Information</h2>
                         <div className="form-field py-6">
                         <label htmlFor="username" className="block text-gray-700 font-semibold mb-2">Username</label>
                                 <Field
@@ -24,20 +42,56 @@ function Register() {
                                     placeholder="Enter Username"
                                     className="w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                                 />
-                            <ErrorMessage name="username" component="div" className="error-message" />
+                            <ErrorMessage name="username" component="div" className="error-message text-red-500" />
                         </div>
                         <div className="form-field pb-6">
                         <label htmlFor="password" className="block text-gray-700 font-semibold mb-2"> Password </label>
                                 <Field
-                                    type="text"
+                                    type="password"
                                     name="password"
                                     placeholder="Enter password"
                                     className="w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                                 />
-                            <ErrorMessage name="password" component="div" className="error-message" />
+                            <ErrorMessage name="password" component="div" className="error-message text-red-500" />
                         </div>
-
-                        <button type="submit" disabled={isSubmitting} className="inline-block rounded px-4 py-3 text-white font-bold transition-colors bg-blue-600 hover:bg-primary-700 active:bg-primary-800 disabled:cursor-not-allowed disabled:bg-red-300">
+                        <div className="form-field pb-6">
+                        <label htmlFor="firstname" className="block text-gray-700 font-semibold mb-2">First Name</label>
+                                <Field
+                                    type="text"
+                                    name="firstname"
+                                    placeholder="Enter First Name"
+                                    className="w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                />
+                            <ErrorMessage name="firstname" component="div" className="error-message text-red-500" />
+                        </div>
+                        <div className="form-field pb-6">
+                        <label htmlFor="lastname" className="block text-gray-700 font-semibold mb-2">Last Name (Surname)</label>
+                                <Field
+                                    type="text"
+                                    name="lastname"
+                                    placeholder="Enter Last Name"
+                                    className="w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                />
+                            <ErrorMessage name="lastname" component="div" className="error-message text-red-500" />
+                        </div>
+                        <div className="form-field pb-6">
+                        <label htmlFor="race" className="block text-gray-700 font-semibold mb-2"> Race/Ethnicity </label>       
+                            <Field
+                                    as="select"
+                                    name="race"
+                                    className="w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                >
+                                    <option value="" label="Select an option" />
+                                    <option value="asian" label="Asian" />
+                                    <option value="black" label="Black or African American" />
+                                    <option value="hispanic" label="Hispanic or Latino" />
+                                    <option value="white" label="White" />
+                                    <option value="native" label="Native American or Alaska Native" />
+                                    <option value="other" label="Other" />
+                                </Field>
+                            <ErrorMessage name="lastname" component="div" className="error-message text-red-500" />
+                        </div>
+                        <button type="submit" disabled={isSubmitting || !isValid || !dirty} className="inline-block rounded px-4 py-3 text-white font-bold transition-colors bg-blue-600 hover:bg-primary-700 active:bg-primary-800 disabled:cursor-not-allowed disabled:bg-red-300">
                             {isSubmitting ? 'Submitting...' : 'Submit'}
                         </button>
                     </Form>
