@@ -1,17 +1,23 @@
 import React from 'react';
-import {APIProvider, Map} from '@vis.gl/react-google-maps';
+import {APIProvider, Map, Marker} from '@vis.gl/react-google-maps';
 
-function MapComponent() {
+const GOOGLE_MAPS_API_KEY = "AIzaSyBoOak0ZV4Cln-yGCg0Z461MiGwemO6JqE";
+
+
+function MapComponent({children}) {
     return (
         <div>
-            <APIProvider apiKey={API_KEY}>
+            <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
                 <Map
                 style={{width: '100vw', height: '100vh'}}
-                defaultCenter={{lat: 22.54992, lng: 0}}
+                defaultCenter={{lat: 40.7128, lng: 74.0060}}
                 defaultZoom={3}
                 gestureHandling={'greedy'}
                 disableDefaultUI={true}
-                />
+                >
+                    {children}
+                </Map>
+                
             </APIProvider>
         </div>
     )
