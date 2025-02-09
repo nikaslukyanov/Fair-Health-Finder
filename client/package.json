@@ -23,7 +23,7 @@
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=3001 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -47,6 +47,12 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-transform-private-property-in-object": "^7.25.9"
-  }
+    "@babel/plugin-transform-private-property-in-object": "^7.25.9",
+    "@tailwindcss/postcss": "^4.0.5",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.1",
+    "postcss-loader": "^8.1.1",
+    "tailwindcss": "^4.0.5"
+  },
+  "proxy": "http://localhost:3000"
 }
