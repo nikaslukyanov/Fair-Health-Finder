@@ -38,15 +38,16 @@ const ChatInterface = () => {
     setIsLoading(true);
 
     try {
-      console.log('Sending request with user:', user); // Debug log
-
+      // Include previous messages in the request for context
       const response = await axios.post('/api/groq', {
         prompt: userMessage.content,
-        userId: user._id || user.id, // Handle both possible ID fields
-        userData: user
+        userId: user._id || user.id,
+        userData: user,
+        messages: messages.map(msg => ({
+          role: msg.role,
+          content: msg.content
+        }))
       });
-
-      console.log('Received response:', response.data); // Debug log
 
       if (response.data && response.data.response) {
         const assistantMessage = {

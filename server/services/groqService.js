@@ -1,30 +1,16 @@
 require('dotenv').config();  // Add this at the top to ensure environment variables are loaded
 const { ChatGroq } = require("@langchain/groq");
-const { ConversationChain } = require("langchain/chains");
-const { BufferMemory } = require("langchain/memory");
 const ChatHistory = require("../models/ChatHistory");
 
 if (!process.env.GROQ_API_KEY) {
   throw new Error('GROQ_API_KEY is not set in environment variables');
 }
 
-// Initialize Groq with LangChain
+// Initialize Groq
 const chat = new ChatGroq({
   apiKey: process.env.GROQ_API_KEY,
   model: "llama-3.3-70b-versatile",
   temperature: 0.7,
-});
-
-// Initialize conversation memory
-const memory = new BufferMemory({
-  returnMessages: true,
-  memoryKey: "history",
-});
-
-// Initialize conversation chain
-const chain = new ConversationChain({
-  llm: chat,
-  memory: memory,
 });
 
 // Function to get chat completion from Groq API
@@ -37,7 +23,7 @@ async function getGroqChatCompletion(userId, prompt, userData) {
       chatHistory = new ChatHistory({ userId, messages: [] });
     }
 
-    // Safely create context with null checks
+    // Create context string from user data and chat history
     const contextPrompt = `
 User Context:
 ${userData ? `
@@ -53,7 +39,7 @@ ${userData ? `
   .join(', ') || 'None reported'}` : 'No user data available'}
 
 Previous conversation context:
-${chatHistory.messages.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+${chatHistory.messages.slice(-5).map(msg => `${msg.role}: ${msg.content}`).join('\n')}
 
 User Question: ${prompt}
 
@@ -68,14 +54,15 @@ Please provide a helpful response based on this medical context.`;
     chatHistory.messages.push(userMessage);
 
     // Get response from Groq
-    const response = await chain.call({
-      input: contextPrompt
-    });
+    const result = await chat.call([
+      { role: "system", content: "You are a helpful healthcare assistant." },
+      { role: "user", content: contextPrompt }
+    ]);
 
     // Add assistant response to history
     const assistantMessage = {
       role: 'assistant',
-      content: response.response,
+      content: result.content,
       timestamp: new Date()
     };
     chatHistory.messages.push(assistantMessage);
@@ -84,7 +71,7 @@ Please provide a helpful response based on this medical context.`;
     await chatHistory.save();
 
     return {
-      response: response.response,
+      response: result.content,
       history: chatHistory.messages
     };
   } catch (error) {
