@@ -30,7 +30,11 @@ const style = {
     pb: 3,
   };
 
-  function interpolateColor(value) {
+  function interpolateColor(value, mean=0, scale=1) {
+    if (value == -1){
+        return "#999999"
+    }
+    value = (value - mean) * scale
     value = Math.max(0, Math.min(100, value)); // Clamp value between 0 and 100
 
     let r, g;
@@ -51,7 +55,7 @@ const style = {
   function CircularProgressWithLabel(props) {
     return (
       <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-        <CircularProgress variant="determinate" {...props} sx={{color: interpolateColor(props.value)}}/>
+        <CircularProgress variant="determinate" {...props} sx={{color: interpolateColor(props.value, props.mean, props.scale)}}/>
         <Box
           sx={{
             top: 0,
@@ -68,7 +72,7 @@ const style = {
             variant="caption"
             component="div"
             sx={{ color: 'text.secondary' }}
-          >{`${Math.round(props.value)}%`}</Typography>
+          >{`${props.value > 0 ? Math.round(props.value) : "N/A"}%`}</Typography>
         </Box>
       </Box>
     );
@@ -76,6 +80,7 @@ const style = {
   
 
 function MapMarkerComponent(props) {
+    console.log(props.details)
     const [modal, setModal] = useState(false);
     const [showSatisfactionModal, setShowSatisfactionModal] = useState(false);
     const [showCostsModal, setShowCostsModal] = useState(false);
@@ -100,28 +105,40 @@ function MapMarkerComponent(props) {
     var cost_score = 0
     var cost_tot = 0
     //var costs = []
-    if (Object.keys(props.details.costs).length > 0) {
+    if (Object.keys(props.details["normalized_scores_by_condition"]).length > 0) {
         for (const disorder of Object.keys(user_profile.health_profile)) {
             //     costs.push([disorder, props.details.costs[disorder]])
-                if (props.details.costs[disorder]) {
-                    console.log(props.details.costs[disorder][user_profile.health_profile[disorder]]["ranking"])
-                    cost_score += score_map[props.details.costs[disorder][user_profile.health_profile[disorder]]["ranking"]]
+                if (props.details["normalized_scores_by_condition"][disorder]) {
+                    console.log(props.details["normalized_scores_by_condition"][disorder])
+                    cost_score += props.details["normalized_scores_by_condition"][disorder]
                     cost_tot += 1
                 }
                 // cost_score += score_map[props.details.costs[disorder][user_profile.health_profile[disorder]]["ranking"]]
              }
     }
     
-    cost_score = cost_tot > 0 ? cost_score / cost_tot : 0
+    cost_score = cost_tot > 0 ? cost_score / cost_tot : -1
 
-    const [overallScore, setOverallScore] = React.useState((cost_score+Number(props.details.satisfaction_summary_stats["Overall hospital rating"]))/2);
+    var score = 0
+    var tot = 0
+    if (cost_score > 0) {
+        score += cost_score
+        tot += 1
+    }
+    if (Number(props.details.satisfaction_summary_stats["Overall hospital rating"]) > 0) {
+        score += Number(props.details.satisfaction_summary_stats["Overall hospital rating"])
+        tot += 1
+    }
+
+    const [overallScore, setOverallScore] = useState(tot>0? score/tot: -1);
+//            <Pin background={'#00FF00'} glyphColor={'#000'} borderColor={'#000'} />
 
     return (
         <React.Fragment>
-            <Marker position={{lat: props.details.lat, lng: props.details.lon}} ref={markerRef}
+            <AdvancedMarker position={{lat: Number(props.details.lat), lng: Number(props.details.lon)}} ref={markerRef}
                 onClick={() => {setModal(true)}}>
-            <Pin background={'#00FF00'} glyphColor={'#000'} borderColor={'#000'} />
-        </Marker>
+                <Pin background={interpolateColor(overallScore, 70, 4)} glyphColor={'#000'} borderColor={'#000'} />
+        </AdvancedMarker>
         <Modal
             open={modal}
             onClose={() => {setModal(false)}}
@@ -134,21 +151,20 @@ function MapMarkerComponent(props) {
                 </Typography>
                 <CircularProgressWithLabel value={overallScore} style={{width: "20vw", height: "20vw"}} />
 
-                <Box style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
-                    <Button sx={{backgroundColor:"black",padding: "10px", display: "flex", flexDirection: "column", alignItems: "center"}} aria-describedby={id} variant="contained" onMouseOver={() => {setShowSatisfactionModal(true)}}
-    >
-                        Satisfaction Rating: {props.details.satisfaction_summary_stats["Overall hospital rating"]}
-                        {showHospital && Object.keys(props.details.satisfaction_summary_stats).map((stat, index) => (
-                        <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
-                            {stat} - {props.details.satisfaction_summary_stats[stat]}
-                        </Typography>
-                    ))}
-                    </Button>
+                <Box style={{display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-around", height: "20vh", width: "100%"}}>
+                    <Box style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}} 
+                            onMouseOver={() => {setShowSatisfactionModal(true)}}>
+                        <CircularProgressWithLabel value={props.details.satisfaction_summary_stats["Overall hospital rating"]} 
+                            style={{width: "10vw", height: "10vw"}} />
+                        <Typography style={{textAlign: "center"}}>Satisfaction Rating</Typography>
+                    </Box>
+                    
+
                     <Modal open={showSatisfactionModal} onClose={() => {setShowSatisfactionModal(false)}} 
                         aria-labelledby="modal-modal-title"
                         aria-describedby="modal-modal-description">
                         <Box sx={{ ...style, width: "40vw", height: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between"}} onMouseLeave={() => {setShowSatisfactionModal(false)}}>
-                            <Typography id="modal-modal-title" variant="h6" component="h2">
+                            <Typography id="modal-modal-title" variant="h6" component="h2" style={{alignItems: "center"}}>
                                 Satisfaction Ratings
                             </Typography>
                             <List style={{maxHeight: '100%', overflow: 'auto', width: '100%'}}>
@@ -165,19 +181,18 @@ function MapMarkerComponent(props) {
                         </Box>
                     </Modal>
 
-
-                    <Button sx={{backgroundColor:"black",padding: "10px", display: "flex", flexDirection: "column", alignItems: "center"}} aria-describedby={id} variant="contained" onClick={() => {setShowCostsModal(true)}}>
-                        Cost Rating: {cost_score}
-                        {showHospital && Object.keys(props.details.satisfaction_summary_stats).map((stat, index) => (
-                        <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
-                            {stat} - {props.details.satisfaction_summary_stats[stat]}
-                        </Typography>
-                    ))}
-                    </Button>
+                    <Box style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}} 
+                            onMouseOver={() => {setShowCostsModal(true)}}>
+                        <CircularProgressWithLabel value={cost_score} 
+                            style={{width: "10vw", height: "10vw"}} />
+                        <Typography style={{textAlign: "center"}}>Cost Rating</Typography>
+                    </Box>
+                    
                     <Modal open={showCostsModal} onClose={() => {setShowCostsModal(false)}} 
                         aria-labelledby="modal-modal-title"
                         aria-describedby="modal-modal-description">
-                        <Box sx={{ ...style, width: "40vw", height: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between"}}>
+                        <Box sx={{ ...style, width: "40vw", height: "65vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between"}}
+                            onMouseLeave={() => {setShowCostsModal(false)}}>
                             <Typography id="modal-modal-title" variant="h6" component="h2">
                                 Cost Ratings
                             </Typography>

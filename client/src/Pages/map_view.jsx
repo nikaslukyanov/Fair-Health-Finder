@@ -13,7 +13,7 @@ function MapView() {
     <div>
       <MapComponent>
 
-        {Object.keys(data).map((key) => {
+        {Object.keys(data).filter(key => data[key]["lat"] != null).map((key) => {
           return (
             <MapMarkerComponent details={data[key]} />
           )
