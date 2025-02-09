@@ -32,7 +32,7 @@ const style = {
   function CircularProgressWithLabel(props) {
     return (
       <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-        <CircularProgress variant="determinate" {...props} />
+        <CircularProgress variant="determinate" {...props}/>
         <Box
           sx={{
             top: 0,
@@ -58,16 +58,20 @@ const style = {
 
 function MapMarkerComponent(props) {
     const [modal, setModal] = useState(false);
-    const [overallScore, setOverallScore] = React.useState(50);
+    const [showSatisfactionModal, setShowSatisfactionModal] = useState(false);
+    const [showCostsModal, setShowCostsModal] = useState(false);
+
     const [showHospital, setShowHospital] = useState(false);
     const [markerRef, marker] = useAdvancedMarkerRef();
 
     const id = showHospital ? 'simple-popover' : undefined;
 
     var score_map = {
+        "significantly above average": 100,
         "average": 50,
-        "above average": 100,
-        "below average": 0
+        "above average": 75,
+        "below average": 25,
+        "significantly below average": 0
     }
     
     //console.log(props.details.costs)
@@ -78,14 +82,18 @@ function MapMarkerComponent(props) {
     if (Object.keys(props.details.costs).length > 0) {
         for (const disorder of Object.keys(user_profile.health_profile)) {
             //     costs.push([disorder, props.details.costs[disorder]])
-                 console.log(props.details.costs[disorder])
+                if (props.details.costs[disorder]) {
+                    console.log(props.details.costs[disorder][user_profile.health_profile[disorder]]["ranking"])
+                    cost_score += score_map[props.details.costs[disorder][user_profile.health_profile[disorder]]["ranking"]]
+                    cost_tot += 1
+                }
                 // cost_score += score_map[props.details.costs[disorder][user_profile.health_profile[disorder]]["ranking"]]
-                 cost_tot += 1
              }
     }
     
     cost_score = cost_tot > 0 ? cost_score / cost_tot : 0
 
+    const [overallScore, setOverallScore] = React.useState((cost_score+Number(props.details.satisfaction_summary_stats["Overall hospital rating"]))/2);
 
     return (
         <React.Fragment>
@@ -99,29 +107,60 @@ function MapMarkerComponent(props) {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
             >
-
             <Box sx={{ ...style, width: "60vw", height: "80vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between"}}>
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                 {props.details.name}
                 </Typography>
                 <CircularProgressWithLabel value={overallScore} style={{width: "20vw", height: "20vw"}} />
 
-                <Button sx={{backgroundColor:"black",padding: "10px", display: "flex", flexDirection: "column", alignItems: "center"}} aria-describedby={id} variant="contained" onClick={() => {setShowHospital(!showHospital)}}>
-                    Satisfaction Rating: {props.details.satisfaction_summary_stats["Overall hospital rating"]}
-                    {showHospital && Object.keys(props.details.satisfaction_summary_stats).map((stat, index) => (
-                    <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
-                        {stat} - {props.details.satisfaction_summary_stats[stat]}
-                    </Typography>
-                ))}
-                </Button>
-                <Button sx={{backgroundColor:"black",padding: "10px", display: "flex", flexDirection: "column", alignItems: "center"}} aria-describedby={id} variant="contained" onClick={() => {setShowHospital(!showHospital)}}>
-                    Cost Rating: {cost_score}
-                    {showHospital && Object.keys(props.details.satisfaction_summary_stats).map((stat, index) => (
-                    <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
-                        {stat} - {props.details.satisfaction_summary_stats[stat]}
-                    </Typography>
-                ))}
-                </Button>
+                <Box style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between"}}>
+                    <Button sx={{backgroundColor:"black",padding: "10px", display: "flex", flexDirection: "column", alignItems: "center"}} aria-describedby={id} variant="contained" onClick={() => {setShowSatisfactionModal(true)}}>
+                        Satisfaction Rating: {props.details.satisfaction_summary_stats["Overall hospital rating"]}
+                        {showHospital && Object.keys(props.details.satisfaction_summary_stats).map((stat, index) => (
+                        <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
+                            {stat} - {props.details.satisfaction_summary_stats[stat]}
+                        </Typography>
+                    ))}
+                    </Button>
+                    <Modal open={showSatisfactionModal} onClose={() => {setShowSatisfactionModal(false)}} 
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description">
+                        <Box sx={{ ...style, width: "40vw", height: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between"}}>
+                            <Typography id="modal-modal-title" variant="h6" component="h2">
+                                Satisfaction Ratings
+                            </Typography>
+                            {Object.keys(props.details.satisfaction_summary_stats).map((stat, index) => (
+                                <Box style={{display: "flex", flexDirection: "row", alignItems: "space-between", justifyContent: "space-between"}} key={index} id="modal-modal-description" sx={{ mt: 2 }}>
+
+                                    <Typography style={{fontSize: "1.5vw", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}} key={index} id="modal-modal-description" sx={{ mt: 2 }}>
+                                        {stat}
+                                    </Typography>
+                                    <CircularProgressWithLabel value={props.details.satisfaction_summary_stats[stat]} />
+                                </Box>
+                            ))}
+                        </Box>
+                    </Modal>
+
+                    <Button sx={{backgroundColor:"black",padding: "10px", display: "flex", flexDirection: "column", alignItems: "center"}} aria-describedby={id} variant="contained" onClick={() => {setShowCostsModal(true)}}>
+                        Cost Rating: {cost_score}
+                        {showHospital && Object.keys(props.details.satisfaction_summary_stats).map((stat, index) => (
+                        <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
+                            {stat} - {props.details.satisfaction_summary_stats[stat]}
+                        </Typography>
+                    ))}
+                    </Button>
+                    <Modal open={showCostsModal} onClose={() => {setShowCostsModal(false)}} 
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description">
+                        <Box sx={{ ...style, width: "40vw", height: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between"}}>
+                            <Typography id="modal-modal-title" variant="h6" component="h2">
+                                Cost Ratings
+                            </Typography>
+                            
+                        </Box>
+                    </Modal>
+                </Box>
+                
                 
                 
             </Box>
