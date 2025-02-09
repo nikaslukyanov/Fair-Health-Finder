@@ -19,7 +19,7 @@ function MapView() {
     setUser(userData);
     
     // Load hospital data
-    const hospitalData = require('../data/hospital_stats_ny_with_costs_with_loc.json');
+    const hospitalData = require('../data/hospital_stats_ny_with_costs_with_safety_with_bias_with_loc.json');
     
     // Filter hospitals based on user profile if needed
     if (userData) {
