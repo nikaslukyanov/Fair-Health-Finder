@@ -33,13 +33,16 @@ function MapMarkerComponent(props) {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
             >
-            <Box sx={{ ...style, width: "60vw", height: "60vh" }}>
+            <Box sx={{ ...style, width: "60vw", height: "80vh" }}>
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                 {props.details.name}
                 </Typography>
-                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                    {props.details.satisfaction_summary_stats["Nurse communication"]}
-                </Typography>
+                {Object.keys(props.details.satisfaction_summary_stats).map((stat, index) => (
+                    <Typography key={index} id="modal-modal-description" sx={{ mt: 2 }}>
+                        {stat} - {props.details.satisfaction_summary_stats[stat]}
+                    </Typography>
+                ))}
+                
             </Box>
             </Modal>
         </React.Fragment>
