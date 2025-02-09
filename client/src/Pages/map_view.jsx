@@ -1,8 +1,13 @@
+import { useState } from 'react';
 import MapComponent from "../components/maps/MapComponent";
 import MapMarkerComponent from "../components/maps/MapMarker";
+import {AdvancedMarker, Pin, useAdvancedMarkerRef} from '@vis.gl/react-google-maps';
 
 function MapView() {
-  const data = require('../data/hospital_satisfaction_stats_ny_with_loc.json');
+  const data = require('../data/hospital_stats_ny_with_costs_with_loc.json');
+  const [markerRef, marker] = useAdvancedMarkerRef();
+  const [modal, setModal] = useState(false);
+  
 
   return (
     <div>
@@ -10,9 +15,7 @@ function MapView() {
 
         {Object.keys(data).map((key) => {
           return (
-            <MapMarkerComponent details={data[key]}>
-              
-            </MapMarkerComponent>
+            <MapMarkerComponent details={data[key]} />
           )
         })}
       </MapComponent>
