@@ -1,4 +1,5 @@
 import './../App.css';
+import Signin from './signin';
 
 function Home() {
   return (
@@ -18,7 +19,7 @@ function Home() {
         <div className="max-w-sm order-2">
           <h3 className="text-xl font-bold mb-2">Already have an account?</h3>
           <p className="mb-4">Let's get you signed in.</p>
-          <a href="/signin" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Sign In</a>
+          <Signin/>
         </div>
       </div>
     </div>

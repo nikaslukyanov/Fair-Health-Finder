@@ -23,8 +23,6 @@ function Signin() {
                 {({ isSubmitting, isValid, dirty}) => (
                     <div className="form-container">
                         <Form className="form">
-                            <h1 className='font-bold text-lg text-center'> Already have an account? </h1>
-                            <h2 className='font-bold text-center'> Let's get you signed in </h2>
                             <div className="form-field py-6">
                             <label htmlFor="username" className="block text-gray-700 font-semibold mb-2">Username</label>
                                     <Field
