@@ -6,6 +6,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^6.4.3",
+    "@vis.gl/react-google-maps": "^1.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cra-template": "1.2.0",
@@ -46,6 +47,11 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-transform-private-property-in-object": "^7.25.9"
+    "@babel/plugin-transform-private-property-in-object": "^7.25.9",
+    "@tailwindcss/postcss": "^4.0.5",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.1",
+    "postcss-loader": "^8.1.1",
+    "tailwindcss": "^4.0.5"
   }
 }
