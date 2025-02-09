@@ -28,7 +28,7 @@ const chain = new ConversationChain({
 });
 
 // Function to get chat completion from Groq API
-async function getGroqChatCompletion(userId, prompt) {
+async function getGroqChatCompletion(userId, prompt, userData) {
   try {
     // Get user's chat history
     let chatHistory = await ChatHistory.findOne({ userId });
@@ -37,22 +37,48 @@ async function getGroqChatCompletion(userId, prompt) {
       chatHistory = new ChatHistory({ userId, messages: [] });
     }
 
+    // Safely create context with null checks
+    const contextPrompt = `
+User Context:
+${userData ? `
+- Name: ${userData.firstname || 'Unknown'} ${userData.lastname || ''}
+- Gender: ${userData.gender || 'Unknown'}
+- Medical Conditions: ${Object.entries(userData || {})
+  .filter(([key, value]) => value === 1 && key.includes('_conditions'))
+  .map(([key]) => key.replace('_conditions', '').replace('_', ' '))
+  .join(', ') || 'None reported'}
+- Symptoms: ${Object.entries(userData || {})
+  .filter(([key, value]) => value === 1 && !key.includes('_conditions'))
+  .map(([key]) => key.replace('_', ' '))
+  .join(', ') || 'None reported'}` : 'No user data available'}
+
+Previous conversation context:
+${chatHistory.messages.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+
+User Question: ${prompt}
+
+Please provide a helpful response based on this medical context.`;
+
     // Add user message to history
-    chatHistory.messages.push({
+    const userMessage = {
       role: 'user',
-      content: prompt
-    });
+      content: prompt,
+      timestamp: new Date()
+    };
+    chatHistory.messages.push(userMessage);
 
     // Get response from Groq
     const response = await chain.call({
-      input: prompt
+      input: contextPrompt
     });
 
     // Add assistant response to history
-    chatHistory.messages.push({
+    const assistantMessage = {
       role: 'assistant',
-      content: response.response
-    });
+      content: response.response,
+      timestamp: new Date()
+    };
+    chatHistory.messages.push(assistantMessage);
 
     // Save chat history
     await chatHistory.save();
@@ -72,8 +98,8 @@ async function getChatHistory(userId) {
     if (!userId) {
       throw new Error("userId is required");
     }
-    const history = await ChatHistory.findOne({ userId });
-    return history ? history.messages : [];
+    const chatHistory = await ChatHistory.findOne({ userId });
+    return chatHistory ? chatHistory.messages : [];
   } catch (error) {
     console.error("Error fetching chat history:", error);
     throw new Error("Failed to fetch chat history");

@@ -6,14 +6,13 @@ const router = express.Router();
 // POST request to call Groq API
 router.post("/", async (req, res) => {
   try {
-    const { prompt } = req.body;
-    const userId = req.body.userId; // Make sure to send userId from frontend
+    const { prompt, userId, userData } = req.body;
 
     if (!prompt || !userId) {
       return res.status(400).json({ error: "Missing prompt or userId" });
     }
 
-    const response = await getGroqChatCompletion(userId, prompt);
+    const response = await getGroqChatCompletion(userId, prompt, userData);
     
     res.status(200).json({
       model: "Groq LLaMA-3.3 70B",
